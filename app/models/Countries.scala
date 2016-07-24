@@ -38,7 +38,7 @@ object Countries {
     }
 
     def get(): Future[Seq[Country]] = {
-        db.run(countries.result)
+        db.run(countries.take(10).result)
     }
 
 }

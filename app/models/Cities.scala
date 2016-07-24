@@ -4,6 +4,7 @@ import play.api.Play
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
+
 import scala.concurrent.Future
 
 
@@ -21,24 +22,39 @@ class Cities(tag: Tag) extends Table[City](tag, "City") {
 
     def population = column[Long]("Population")
 
-    def country = foreignKey("SUP_FK", countryCode, Countries.countries)(_.code, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
-
     def * = (id, name, countryCode, district, population) <>(City.tupled, City.unapply)
+
+    def country = foreignKey("SUP_FK", countryCode, Countries.countries)(_.code, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
 }
+/*
+Ex:
+- drop(10).take(5): limit 5 offset 10
+- sortBy(_.name.desc.nullsFirst):  order by "COF_NAME" desc nulls first
+
+ */
 
 // Services for City table
 object Cities {
 
     val db = DatabaseConfigProvider.get[JdbcProfile](Play.current).db
 
-    val cities = TableQuery[Cities]
+    lazy val cities = TableQuery[Cities]
 
+    // filter by field
     def get(id: Long): Future[Option[City]] = {
         db.run(cities.filter(_.id === id).result.headOption)
     }
 
+    // limit 10
     def get(): Future[Seq[City]] = {
-        db.run(cities.result)
+      db.run(cities.take(10).result)
     }
 
+    def getCountry(idCity: Long): Future[Option[(String, String)]] = {
+        val q = for {
+            ci <- cities if ci.id === idCity
+            co <- Countries.countries if co.code === ci.countryCode
+        } yield (co.name, ci.name)
+        db.run(q.result.headOption)
+    }
 }

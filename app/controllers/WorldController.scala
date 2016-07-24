@@ -8,10 +8,9 @@ import play.api.mvc._
 import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.concurrent.duration._
+import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 
 import utils._
-import utils.Serializers._
 
 /**
   * This controller creates an `Action` that demonstrates how to write
@@ -36,9 +35,21 @@ class WorldController @Inject() (actorSystem: ActorSystem)(implicit exec: Execut
     def getCities = Action.async {
         val cities = Cities.get()
         cities.map(citySeq => {
-            val response = JsonResponse(JsonResponse.CODE_SUCCESS, "All City List", Json.toJson(citySeq))
-            Ok(Json.toJson(response))
+            val response = ""
+            //val response = JsonResponse(JsonResponse.CODE_SUCCESS, "All City List", citySeq.asJson)
+            Ok(response.asJson.noSpaces)
         })
     }
+
+    def getCountryOfCity(id: Long) = Action.async {
+        val city = Cities.getCountry(id)
+        city.map({
+            case Some(c) =>
+                val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
+                Ok(response.asJson.noSpaces)
+            case None => Ok("Error")
+        })
+    }
+
 
 }

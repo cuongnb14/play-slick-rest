@@ -1,8 +1,8 @@
 package utils
 
-import play.api.libs.json.JsValue
+import io.circe._
 
-case class JsonResponse(code: Int, message: String, data: JsValue)
+case class JsonResponse(code: Int, message: String, data: Json)
 
 object JsonResponse{
     val CODE_SUCCESS = 200
@@ -22,4 +22,5 @@ object JsonResponse{
 
     val CODE_SUCCESS_CREATE_FILE = 300
     val CODE_FAIL_CREATE_FILE = 301
+
 }

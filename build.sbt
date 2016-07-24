@@ -18,4 +18,12 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0"
 )
 
+val circeVersion = "0.4.1"
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
+
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
