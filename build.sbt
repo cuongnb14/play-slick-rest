@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.36",
   "com.typesafe.play" %% "play-slick" % "2.0.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0"
+  "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
+  "com.google.code.gson" % "gson" % "2.7"
 )
 
 val circeVersion = "0.4.1"

@@ -1,5 +1,6 @@
 package models
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.Play
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
@@ -56,6 +57,30 @@ object Cities {
       ci <- cities if ci.id === idCity
       co <- Countries.countries if co.code === ci.countryCode
     } yield (co.name, ci.name)
+
     db.run(q.result.headOption)
   }
+
+  def getCountry(): Future[Seq[Map[String, Either[Long, String]]]] = {
+    val q = for {
+      ci <- cities
+      co <- Countries.countries if co.code === ci.countryCode
+    } yield (co.name , ci.name, ci.id, ci.population)
+
+
+    val cs: Future[Seq[(String, String, Long, Long)]] = db.run(q.take(1000).result)
+    cs.map{
+      citySeq => {
+        citySeq.map(
+          rs => Map[String, Either[Long, String]](
+            "city" -> Right(rs._2),
+            "country" -> Right(rs._1),
+            "id" -> Left(rs._3),
+            "popu" -> Left(rs._4)
+          )
+        )
+      }
+    }
+  }
+
 }

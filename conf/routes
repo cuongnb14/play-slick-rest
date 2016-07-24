@@ -15,3 +15,5 @@ GET        /assets/*file              controllers.Assets.versioned(path="/public
 GET        /cities                    controllers.WorldController.getCities
 GET        /cities/:id/country        controllers.WorldController.getCountryOfCity(id: Long)
 GET        /test                        controllers.HomeController.test
+
+GET        /cities/country            controllers.WorldController.getCountryOfAllCity()

@@ -5,12 +5,15 @@ import javax.inject._
 
 import models.Cities
 import play.api.mvc._
-import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
-
+import io.circe._
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 import utils._
+import utils.Serializers._
+import utils.ShortCut._
 
 /**
   * This controller creates an `Action` that demonstrates how to write
@@ -44,9 +47,19 @@ class WorldController @Inject()(actorSystem: ActorSystem)(implicit exec: Executi
     val city = Cities.getCountry(id)
     city.map({
       case Some(c) =>
-        val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
-        Ok(response.asJson.noSpaces)
-      case None => Ok("Error")
+        //val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
+        //Ok(response.asJson.noSpaces)
+        Ok("Error")
+      case None =>
+        //val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
+        Ok("Error")
+    })
+  }
+
+  def getCountryOfAllCity() = Action.async {
+    val cities = Cities.getCountry()
+    cities.map(citySeq => {
+      jResponse("", citySeq.asJson)
     })
   }
 
