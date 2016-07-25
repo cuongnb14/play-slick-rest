@@ -9,10 +9,6 @@ import play.api.mvc._
 import models._
 import utils.Serializers._
 
-import io.circe._
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the

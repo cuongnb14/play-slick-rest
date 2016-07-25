@@ -52,30 +52,40 @@ object Cities {
     db.run(cities.take(10).result)
   }
 
-  def getCountry(idCity: Long): Future[Option[(String, String)]] = {
+  def getCountry(idCity: Long): Future[Option[Map[String, Any]]] = {
     val q = for {
       ci <- cities if ci.id === idCity
       co <- Countries.countries if co.code === ci.countryCode
     } yield (co.name, ci.name)
 
-    db.run(q.result.headOption)
+    val result: Future[Option[(String, String)]] = db.run(q.result.headOption)
+    result.map{
+      _ match {
+        case Some(rs) => Some(Map[String, Any](
+                        "city" -> rs._2,
+                        "country" -> rs._1
+                      ))
+        case None => None
+      }
+
+    }
   }
 
-  def getCountry(): Future[Seq[Map[String, Either[Long, String]]]] = {
+  def getCountry(): Future[Seq[Map[String, Any]]] = {
     val q = for {
       ci <- cities
       co <- Countries.countries if co.code === ci.countryCode
     } yield (co.name, ci.name, ci.id, ci.population)
 
 
-    val cs: Future[Seq[(String, String, Long, Option[Long])]] = db.run(q.take(100).result)
+    val cs: Future[Seq[(String, String, Long, Option[Long])]] = db.run(q.take(10).result)
     cs.map {
       _.map(
-        rs => Map[String, Either[Long, String]](
-          "city" -> Right(rs._2),
-          "country" -> Right(rs._1),
-          "id" -> Left(rs._3),
-          "popu" -> Left(rs._4.getOrElse(1L))
+        rs => Map[String, Any](
+          "city" -> rs._2,
+          "country" -> rs._1,
+          "id" -> rs._3,
+          "popu" -> rs._4.getOrElse(None)
         )
       )
     }

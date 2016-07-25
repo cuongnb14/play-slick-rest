@@ -5,12 +5,8 @@ import javax.inject._
 
 import models.Cities
 import play.api.mvc._
-
+import play.api.libs.json._
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import io.circe._
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
 import utils._
 import utils.Serializers._
 import utils.ShortCut._
@@ -38,8 +34,7 @@ class WorldController @Inject()(actorSystem: ActorSystem)(implicit exec: Executi
   def getCities = Action.async {
     val cities = Cities.get()
     cities.map(citySeq => {
-      val response = JsonResponse(JsonResponse.CODE_SUCCESS, "All City List", citySeq.asJson)
-      Ok(response.asJson.noSpaces)
+      jResponse("", Json.toJson(citySeq))
     })
   }
 
@@ -47,8 +42,7 @@ class WorldController @Inject()(actorSystem: ActorSystem)(implicit exec: Executi
     val city = Cities.getCountry(id)
     city.map({
       case Some(c) =>
-        val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
-        Ok(response.asJson.noSpaces)
+        jResponse("", Json.toJson(c))
       case None =>
         jResponse(JsonResponse.CODE_SUCCESS, "Error")
     })
@@ -57,7 +51,7 @@ class WorldController @Inject()(actorSystem: ActorSystem)(implicit exec: Executi
   def getCountryOfAllCity = Action.async {
     val cities = Cities.getCountry()
     cities.map(citySeq => {
-      jResponse("", citySeq.asJson)
+      jResponse("", Json.toJson(citySeq))
     })
   }
 
