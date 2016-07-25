@@ -9,7 +9,7 @@ import slick.driver.MySQLDriver.api._
 import scala.concurrent.Future
 
 
-case class City(id: Long, name: String, countryCode: String, district: String, population: Long)
+case class City(id: Long, name: String, countryCode: String, district: String, population: Option[Long])
 
 // Definition of the City table
 class Cities(tag: Tag) extends Table[City](tag, "City") {
@@ -21,7 +21,7 @@ class Cities(tag: Tag) extends Table[City](tag, "City") {
 
   def district = column[String]("District")
 
-  def population = column[Long]("Population")
+  def population = column[Option[Long]]("Population")
 
   def * = (id, name, countryCode, district, population) <>(City.tupled, City.unapply)
 
@@ -65,21 +65,19 @@ object Cities {
     val q = for {
       ci <- cities
       co <- Countries.countries if co.code === ci.countryCode
-    } yield (co.name , ci.name, ci.id, ci.population)
+    } yield (co.name, ci.name, ci.id, ci.population)
 
 
-    val cs: Future[Seq[(String, String, Long, Long)]] = db.run(q.take(1000).result)
-    cs.map{
-      citySeq => {
-        citySeq.map(
-          rs => Map[String, Either[Long, String]](
-            "city" -> Right(rs._2),
-            "country" -> Right(rs._1),
-            "id" -> Left(rs._3),
-            "popu" -> Left(rs._4)
-          )
+    val cs: Future[Seq[(String, String, Long, Option[Long])]] = db.run(q.take(100).result)
+    cs.map {
+      _.map(
+        rs => Map[String, Either[Long, String]](
+          "city" -> Right(rs._2),
+          "country" -> Right(rs._1),
+          "id" -> Left(rs._3),
+          "popu" -> Left(rs._4.getOrElse(1L))
         )
-      }
+      )
     }
   }
 

@@ -12,5 +12,15 @@ object ShortCut {
     Ok(response.asJson.noSpaces)
   }
 
+  def jResponse(data: Json): Result ={
+    val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Success", data)
+    Ok(response.asJson.noSpaces)
+  }
+
+  def jResponse(code: Int, message: String): Result ={
+    val response = JsonResponse(code, message, null)
+    Ok(response.asJson.noSpaces)
+  }
+
 
 }

@@ -47,16 +47,14 @@ class WorldController @Inject()(actorSystem: ActorSystem)(implicit exec: Executi
     val city = Cities.getCountry(id)
     city.map({
       case Some(c) =>
-        //val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
-        //Ok(response.asJson.noSpaces)
-        Ok("Error")
+        val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
+        Ok(response.asJson.noSpaces)
       case None =>
-        //val response = JsonResponse(JsonResponse.CODE_SUCCESS, "Country", c.asJson)
-        Ok("Error")
+        jResponse(JsonResponse.CODE_SUCCESS, "Error")
     })
   }
 
-  def getCountryOfAllCity() = Action.async {
+  def getCountryOfAllCity = Action.async {
     val cities = Cities.getCountry()
     cities.map(citySeq => {
       jResponse("", citySeq.asJson)
